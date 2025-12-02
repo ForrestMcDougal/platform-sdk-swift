@@ -4,8 +4,36 @@ import FoundationNetworking
 #endif
 
 public enum YouVersionAPI {
+
+    /// This doesn't refresh the token when required, and therefore doesn't have to be async.
     public static var isSignedIn: Bool {
         YouVersionPlatformConfiguration.accessToken != nil
+    }
+
+    /// This can cause a token refresh if an access token is present but is old.
+    public static func hasValidToken(session: URLSession = .shared) async -> Bool {
+        guard let data = YouVersionPlatformConfiguration.authData,
+              let expiry = data.expiryDate
+        else {
+            return false
+        }
+        guard expiry.timeIntervalSinceNow < 30 else {
+            return true
+        }
+        guard let refreshToken = data.refreshToken,
+              let result = try? await Users.performRefresh(with: refreshToken, idToken: data.idToken, session: session) else {
+            print("token refresh failed")
+            return false
+        }
+        await MainActor.run {
+            YouVersionPlatformConfiguration.saveAuthData(
+                accessToken: result.accessToken,
+                refreshToken: result.refreshToken,
+                idToken: result.idToken,
+                expiryDate: result.expiryDate
+            )
+        }
+        return true
     }
 
     static func commonFetch(url: URL?, accessToken: String?, session: URLSession) async throws -> Data {
