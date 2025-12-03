@@ -1,7 +1,7 @@
 import SwiftUI
 import YouVersionPlatformCore
 
-struct BibleReaderFontSettingsView: View, ReaderColors {
+struct BibleReaderFontSettingsView: View {
     @Environment(BibleReaderViewModel.self) private var viewModel
 
     var body: some View {
@@ -36,7 +36,7 @@ struct BibleReaderFontSettingsView: View, ReaderColors {
         .padding()
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(borderPrimaryColor, lineWidth: 1)
+                .stroke(viewModel.readerBorderPrimaryColor, lineWidth: 1)
         )
     }
 
@@ -87,7 +87,7 @@ struct BibleReaderFontSettingsView: View, ReaderColors {
         .background(theme.background)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(borderSecondaryColor, lineWidth: 1)
+                .stroke(viewModel.readerBorderSecondaryColor, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -110,7 +110,7 @@ struct BibleReaderFontSettingsView: View, ReaderColors {
                 .buttonStyle(PlainButtonStyle())
                 .background(
                     HalfRoundedRectangleShape(side: .left)
-                        .fill(buttonPrimaryColor)
+                        .fill(viewModel.readerButtonPrimaryColor)
                 )
 
                 Rectangle()
@@ -130,7 +130,7 @@ struct BibleReaderFontSettingsView: View, ReaderColors {
                 .buttonStyle(PlainButtonStyle())
                 .background(
                     HalfRoundedRectangleShape(side: .right)
-                        .fill(buttonPrimaryColor)
+                        .fill(viewModel.readerButtonPrimaryColor)
                 )
             }
 
@@ -153,7 +153,7 @@ struct BibleReaderFontSettingsView: View, ReaderColors {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(buttonPrimaryColor)
+                        .fill(viewModel.readerButtonPrimaryColor)
                 )
             }
             .buttonStyle(PlainButtonStyle())

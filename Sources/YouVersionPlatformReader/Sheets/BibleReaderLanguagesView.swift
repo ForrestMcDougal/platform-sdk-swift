@@ -1,7 +1,16 @@
 import SwiftUI
 
-struct BibleReaderLanguagesView: View, ReaderColors {
+struct BibleReaderLanguagesView: View {
     @Environment(BibleReaderViewModel.self) private var viewModel
+
+    init(viewModel: BibleReaderViewModel) {
+#if canImport(UIKit)
+        UISegmentedControl.appearance().tintColor = UIColor(viewModel.readerButtonPrimaryColor)
+        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(viewModel.readerWhiteColor)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor(viewModel.readerTextPrimaryColor)], for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor(viewModel.readerTextPrimaryColor)], for: .selected)
+#endif
+    }
 
     enum Segment: String, CaseIterable, Identifiable {
         case suggested
@@ -23,19 +32,24 @@ struct BibleReaderLanguagesView: View, ReaderColors {
                         .font(.system(size: 16, weight: .semibold))
                         .padding(.leading)
                     TextField(String.localized("generic.search"), text: $searchText)
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(.plain)
                         .focused($searchFieldIsFocused)
                         .disableAutocorrection(true)
                         #if os(iOS)
                         .textInputAutocapitalization(.never)
                         #endif
                         .padding(8)
+                        .foregroundStyle(viewModel.readerTextPrimaryColor)
+                        .background(
+                            Capsule()
+                                .fill(viewModel.readerButtonPrimaryColor)
+                        )
                     Button(String.localized("generic.cancel")) {
                         selectedSegment = .suggested
                     }
                     .padding(.trailing)
                 }
-                .background(buttonPrimaryColor)
+                Divider()
             } else {
                 Picker("", selection: $selectedSegment) {
                     let allMsg = String(
@@ -76,7 +90,6 @@ struct BibleReaderLanguagesView: View, ReaderColors {
             }
 
         }
-        .navigationTitle(String.localized("languageList.title"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -84,6 +97,15 @@ struct BibleReaderLanguagesView: View, ReaderColors {
             viewModel.versionsStackPop()
         }
         .toolbar {
+#if os(iOS)
+            if #available(iOS 15, *) {
+                ToolbarItem(placement: .title) {
+                    Text(String.localized("languageList.title"))
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.readerTextPrimaryColor)
+                }
+            }
+#endif
             ToolbarItem(placement: .automatic) {
                 Button {
                     searchFieldIsFocused = true
@@ -146,6 +168,6 @@ struct BibleReaderLanguagesView: View, ReaderColors {
 }
 
 #Preview {
-    BibleReaderLanguagesView()
+    BibleReaderLanguagesView(viewModel: BibleReaderViewModel.preview)
         .environment(BibleReaderViewModel.preview)
 }

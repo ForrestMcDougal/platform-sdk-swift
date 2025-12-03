@@ -2,7 +2,7 @@ import SwiftUI
 import YouVersionPlatformCore
 import YouVersionPlatformUI
 
-public struct BibleReaderMyVersionsView: View, ReaderColors {
+public struct BibleReaderMyVersionsView: View {
     @Environment(BibleReaderViewModel.self) private var viewModel
 
     public var body: some View {
@@ -25,18 +25,26 @@ public struct BibleReaderMyVersionsView: View, ReaderColors {
             .padding(.horizontal, 16)
             .background(
                 Capsule()
-                    .fill(buttonPrimaryColor)
+                    .fill(viewModel.readerButtonPrimaryColor)
             )
             .padding(.bottom, 8)
             Text(viewModel.bibleVersionStatisticsPromo)
                 .font(.caption)
             Spacer()
         }
-        .navigationTitle(String.localized("myVersions.title"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
+#if os(iOS)
+            if #available(iOS 15, *) {
+                ToolbarItem(placement: .title) {
+                    Text(String.localized("myVersions.title"))
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.readerTextPrimaryColor)
+                }
+            }
+#endif
             ToolbarItem(placement: .automatic) {
                 Button {
                     handleMoreVersions()

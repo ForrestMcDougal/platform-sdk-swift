@@ -1,7 +1,7 @@
 import SwiftUI
 import YouVersionPlatformCore
 
-struct BibleVersionDownloadView: View, ReaderColors {
+struct BibleVersionDownloadView: View {
     @Environment(BibleReaderViewModel.self) private var viewModel
     @Environment(\.openURL) private var openURL
 
@@ -41,8 +41,8 @@ struct BibleVersionDownloadView: View, ReaderColors {
                 .buttonStyle(
                     BigButtonStyle(
                         strokeColor: .clear,
-                        backgroundColor: buttonContrastColor,
-                        foregroundColor: textInvertedColor
+                        backgroundColor: viewModel.readerButtonContrastColor,
+                        foregroundColor: viewModel.readerTextInvertedColor
                     )
                 )
                 .padding()
@@ -57,7 +57,7 @@ struct BibleVersionDownloadView: View, ReaderColors {
                 .buttonStyle(
                     BigButtonStyle(
                         strokeColor: .clear,
-                        backgroundColor: buttonSecondaryColor,
+                        backgroundColor: viewModel.readerButtonSecondaryColor,
                         foregroundColor: viewModel.readerTextPrimaryColor
                     )
                 )

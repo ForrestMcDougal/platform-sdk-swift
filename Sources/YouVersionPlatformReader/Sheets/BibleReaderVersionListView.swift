@@ -2,7 +2,7 @@ import SwiftUI
 import YouVersionPlatformCore
 import YouVersionPlatformUI
 
-public struct BibleReaderVersionListView: View, ReaderColors {
+public struct BibleReaderVersionListView: View {
     @Environment(BibleReaderViewModel.self) private var viewModel
     @State private var searchText = ""
 
@@ -39,8 +39,16 @@ public struct BibleReaderVersionListView: View, ReaderColors {
                 }
             }
         }
-        .navigationTitle(viewModel.bibleVersionStatisticsPromo)
 #if os(iOS)
+        .toolbar {
+            if #available(iOS 15, *) {
+                ToolbarItem(placement: .title) {
+                    Text(viewModel.bibleVersionStatisticsPromo)
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.readerTextPrimaryColor)
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
 #endif
         .customBackButton {
@@ -55,18 +63,23 @@ public struct BibleReaderVersionListView: View, ReaderColors {
             Image(systemName: "magnifyingglass")
                 .imageScale(.medium)
                 .foregroundStyle(.secondary)
-            TextField("", text: $searchText, prompt: Text(String.localized("versionList.searchPlaceholder")))
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                #endif
-                .autocorrectionDisabled(true)
-                .accessibilityLabel(String.localized("versionList.searchPlaceholder"))
+            TextField(
+                "",
+                text: $searchText,
+                prompt: Text(String.localized("versionList.searchPlaceholder"))
+                    .foregroundStyle(viewModel.readerTextMutedColor)
+            )
+            #if os(iOS)
+            .textInputAutocapitalization(.never)
+            #endif
+            .autocorrectionDisabled(true)
+            .accessibilityLabel(String.localized("versionList.searchPlaceholder"))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(
             Capsule()
-                .fill(buttonPrimaryColor)
+                .fill(viewModel.readerButtonPrimaryColor)
         )
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
@@ -92,7 +105,7 @@ public struct BibleReaderVersionListView: View, ReaderColors {
                 .padding(.vertical, 2)
                 .background(
                     Capsule()
-                        .fill(buttonPrimaryColor)
+                        .fill(viewModel.readerButtonPrimaryColor)
                 )
             Image(systemName: "chevron.right")
             Spacer()
