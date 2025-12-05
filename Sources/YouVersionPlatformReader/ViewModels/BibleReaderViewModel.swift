@@ -156,12 +156,14 @@ final class BibleReaderViewModel {
     var showingSignInSheet = false
     var showingFontSettings = false
     var showingFontList = false
+    var showingFootnotes = false
     var showingVerseActionsDrawer = false
     var selectedVerses: Set<BibleReference> = []
 
     var showingBookPicker = false
     private var showingChapterPicker = false
     var headerExpandedBookCode: String?
+    var footnotesToDisplay: [BibleFootnote] = []
 
     let readerMaxWidth = CGFloat(700)  // of the reader and the verse action drawer, maybe others
 
@@ -173,14 +175,19 @@ final class BibleReaderViewModel {
 
     var textOptions: BibleTextOptions {
         ReaderFonts.installFontsIfNeeded()
+        let ourFontSize = fontSize ?? 18
+        let footnoteMarker = BibleAttributedString("\u{00a0}※ ")
+            .setBaselineOffset(ourFontSize * 0.3)
         return BibleTextOptions(
             fontFamily: fontFamily ?? "Georgia",
-            fontSize: fontSize ?? 18,
+            fontSize: ourFontSize,
             // TODO: maybe have one of these spacings be a delta added to the other:
             lineSpacing: lineSpacing,
             paragraphSpacing: lineSpacing,
             textColor: readerTextPrimaryColor,
-            wocColor: readerWordsOfChristColor
+            wocColor: readerWordsOfChristColor,
+            footnoteMode: .marker,
+            footnoteMarker: footnoteMarker
         )
     }
 

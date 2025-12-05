@@ -71,6 +71,13 @@ public struct BibleReaderView: View {
         .sheet(isPresented: $viewModel.showingFontSettings, content: {
             fontSettingsSheet
         })
+        .sheet(isPresented: $viewModel.showingFootnotes, content: {
+            BibleReaderFootnotesView()
+                .foregroundStyle(viewModel.readerTextPrimaryColor)
+                .presentationBackground(viewModel.readerCanvasPrimaryColor)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.medium, .large])
+        })
         .sheet(isPresented: $viewModel.showingSignInSheet, content: {
             signInView
         })
@@ -201,13 +208,12 @@ public struct BibleReaderView: View {
                 .frame(height: 0)
                 if viewModel.version != nil {
                     VStack(alignment: .leading) {
-                        //bibleChapterHeader  // we will want this on Android but not iOS (for now)
                         BibleTextView(
                             viewModel.reference,
                             textOptions: viewModel.textOptions,
                             selectedVerses: $viewModel.selectedVerses,
-                            onVerseTap: { reference, _ in
-                                viewModel.handleVerseTap(reference: reference)
+                            onVerseTap: { reference, actionType, footnotes in
+                                viewModel.handleVerseTap(reference: reference, actionType: actionType, footnotes: footnotes)
                             }
                         )
                         bibleCopyrightBlock

@@ -3,7 +3,7 @@ import YouVersionPlatformCore
 
 public struct BibleTextView: View {
 
-    public typealias VerseTapAction = (BibleReference, CGPoint) -> Void
+    public typealias VerseTapAction = (BibleReference, String, [BibleFootnote]) -> Void
 
     private let reference: BibleReference
     private let textOptions: BibleTextOptions
@@ -70,7 +70,8 @@ public struct BibleTextView: View {
         }
         .environment(\.openURL, OpenURLAction(handler: { url in
             if let reference = parseReference(url: url) {
-                onVerseTap?(reference, CGPoint(x: 0, y: 0))
+                let footnotes = footnotesFor(reference: reference)
+                onVerseTap?(reference, url.scheme ?? BibleVersionRendering.LinkSchemes.reference.rawValue, footnotes)
             }
             return .handled
         }))
@@ -89,8 +90,18 @@ public struct BibleTextView: View {
         }
     }
 
+    private func footnotesFor(reference: BibleReference) -> [BibleFootnote] {
+        var footnotes: [BibleFootnote] = []
+        for block in blocks {
+            for footnote in block.footnotes where footnote.reference == reference {
+                footnotes.append(footnote)
+            }
+        }
+        return footnotes
+    }
+
     private func parseReference(url: URL) -> BibleReference? {
-        guard url.scheme == "reference",
+        guard url.scheme == BibleVersionRendering.LinkSchemes.reference.rawValue || url.scheme == BibleVersionRendering.LinkSchemes.footnote.rawValue,
               let host = url.host,
               let versionId = Int(host) else {
             return nil
@@ -131,8 +142,9 @@ public struct BibleTextView: View {
         do {
             if let blocks = try await BibleVersionRendering.textBlocks(
                 reference,
+                renderHeadlines: textOptions.renderHeadlines,
                 renderVerseNumbers: textOptions.renderVerseNumbers,
-                renderFootnotes: textOptions.footnoteMode != .none,
+                footnotesMode: textOptions.footnoteMode,
                 footnoteMarker: textOptions.footnoteMarker,
                 textColor: textOptions.textColor ?? Color.primary,
                 wocColor: textOptions.wocColor,
@@ -213,12 +225,6 @@ public struct BibleTextView: View {
 
 }
 
-public enum BibleTextFootnoteMode {
-    case none
-    case inline
-    case marker
-}
-
 public struct BibleTextOptions {
     public let fontFamily: String
     public let fontSize: CGFloat
@@ -226,6 +232,7 @@ public struct BibleTextOptions {
     public let paragraphSpacing: CGFloat?
     public let textColor: Color?
     public let wocColor: Color
+    public let renderHeadlines: Bool
     public let renderVerseNumbers: Bool
     public let footnoteMode: BibleTextFootnoteMode
     public let footnoteMarker: BibleAttributedString?
@@ -236,6 +243,7 @@ public struct BibleTextOptions {
                 paragraphSpacing: CGFloat? = nil,
                 textColor: Color? = nil,
                 wocColor: Color = Color(red: 1, green: 0x3d / 255.0, blue: 0x4d / 255.0),   // YouVersion red. F04C59 in dark mode.
+                renderHeadlines: Bool = true,
                 renderVerseNumbers: Bool = true,
                 footnoteMode: BibleTextFootnoteMode = .none,
                 footnoteMarker: BibleAttributedString? = nil) {
@@ -245,6 +253,7 @@ public struct BibleTextOptions {
         self.paragraphSpacing = paragraphSpacing ?? fontSize / 2
         self.textColor = textColor
         self.wocColor = wocColor
+        self.renderHeadlines = renderHeadlines
         self.renderVerseNumbers = renderVerseNumbers
         self.footnoteMode = footnoteMode
         self.footnoteMarker = footnoteMarker
