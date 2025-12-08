@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.5.0](https://github.com/youversion/platform-sdk-swift/compare/0.4.0...0.5.0) (2025-12-08)
+
+
+### Features
+
+* **ui:** add footnoteImage option ([f8c91d8](https://github.com/youversion/platform-sdk-swift/commit/f8c91d859051a1d0c8766e5bc5513b95ef1c8709))
+
 # [0.4.0](https://github.com/youversion/platform-sdk-swift/compare/0.3.0...0.4.0) (2025-12-08)
 
 
