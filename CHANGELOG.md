@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1](https://github.com/youversion/platform-sdk-swift/compare/0.5.0...0.5.1) (2025-12-09)
+
+
+### Bug Fixes
+
+* **reader:** adjust the Footnote marker image's size to match the font ([4693d37](https://github.com/youversion/platform-sdk-swift/commit/4693d3765939d3de079c7f96684e9e29c32d352c))
+
 # [0.5.0](https://github.com/youversion/platform-sdk-swift/compare/0.4.0...0.5.0) (2025-12-08)
 
 
