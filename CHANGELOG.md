@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0](https://github.com/youversion/platform-sdk-swift/compare/0.5.1...1.0.0) (2025-12-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove outdated VersionView.swift and ship 1.0 (#28)
+
+### Features
+
+* remove outdated VersionView.swift and ship 1.0 ([#28](https://github.com/youversion/platform-sdk-swift/issues/28)) ([27674b2](https://github.com/youversion/platform-sdk-swift/commit/27674b21e28bbc4da50b206ea152e234cec4792c))
+
 ## [0.5.1](https://github.com/youversion/platform-sdk-swift/compare/0.5.0...0.5.1) (2025-12-09)
 
 
