@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1](https://github.com/youversion/platform-sdk-swift/compare/1.0.0...1.0.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* correct colors on the BibleReaderLanguagesView segmented picker ([91c770e](https://github.com/youversion/platform-sdk-swift/commit/91c770ea5c9f8de892673e10fcd7beab486cd7be))
+
 ## [1.0.0](https://github.com/youversion/platform-sdk-swift/compare/0.5.1...1.0.0) (2025-12-15)
 
 
