@@ -80,13 +80,13 @@ jobs:
 
           # Create JSON endpoint for shields.io
           cat > .github/badges/coverage.json << EOF
-{
-  "schemaVersion": 1,
-  "label": "coverage",
-  "message": "${COVERAGE}%",
-  "color": "${COLOR}"
-}
-EOF
+          {
+            "schemaVersion": 1,
+            "label": "coverage",
+            "message": "${COVERAGE}%",
+            "color": "${COLOR}"
+          }
+          EOF
 
       - name: Commit coverage data
         run: |
