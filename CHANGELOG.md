@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/youversion/platform-sdk-swift/compare/1.0.1...2.0.0) (2026-01-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* the LanguageOverview struct's members now are all optional.
+
+Access them now with the normal SwiftUI optional-chaining logic.
+Reasoning: when you send the "fields[]" parameter to the UI, it will omit whatever fields weren't requested.
+
+### Performance Improvements
+
+* optimizes API calls getting the lists of Bible versions and language data ([0cb6579](https://github.com/youversion/platform-sdk-swift/commit/0cb6579628da903530ee668a0b2508ba67a9b422))
+
 ## [1.0.1](https://github.com/youversion/platform-sdk-swift/compare/1.0.0...1.0.1) (2025-12-22)
 
 
