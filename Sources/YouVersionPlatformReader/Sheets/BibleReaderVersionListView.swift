@@ -14,19 +14,11 @@ public struct BibleReaderVersionListView: View {
             searchInput
             languageDisplay
                 .onTapGesture {
-                    viewModel.versionsStackPush(to: .languages)
+                    viewModel.languageTapped()
                 }
             Group {
-                if viewModel.permittedVersions.isEmpty {
-                    VStack {
-                        Spacer()
-                        ProgressView()
-                            .tint(viewModel.readerTextMutedColor)
-                        Spacer()
-                        Spacer()
-                    }
-                } else {
-                    List(filteredVersions, id: \.id) { v in
+                if let versions = filteredVersions {
+                    List(versions, id: \.id) { v in
                         BibleVersionOverviewListItem(item: v)
                             .listRowBackground(viewModel.readerCanvasPrimaryColor)
                             .listRowSeparator(.hidden)
@@ -36,6 +28,14 @@ public struct BibleReaderVersionListView: View {
                             }
                     }
                     .listStyle(PlainListStyle())
+                } else {
+                    VStack {
+                        Spacer()
+                        ProgressView()
+                            .tint(viewModel.readerTextMutedColor)
+                        Spacer()
+                        Spacer()
+                    }
                 }
             }
         }
@@ -56,6 +56,9 @@ public struct BibleReaderVersionListView: View {
         }
         .foregroundStyle(viewModel.readerTextPrimaryColor)
         .background(viewModel.readerCanvasPrimaryColor)
+        .onChange(of: viewModel.activeLanguage, initial: true) { _, newValue in
+            viewModel.fetchVersionsInLanguage(code: newValue)
+        }
     }
 
     private var searchInput: some View {
@@ -85,20 +88,12 @@ public struct BibleReaderVersionListView: View {
         .padding(.bottom, 8)
     }
 
-    // We might need to look up the language name from our own API instead of this.
-    private func languageName(_ lang: String) -> String {
-        Locale.current.localizedString(forLanguageCode: lang) ?? lang
-    }
-
-    private var activeLanguage: String {
-        viewModel.chosenLanguage ?? viewModel.version?.languageTag ?? "en"
-    }
     private var languageDisplay: some View {
-        let language = activeLanguage
-        let versionsInLanguage = viewModel.permittedVersions.filter { $0.languageTag == language }
+        let language = viewModel.activeLanguage
+        let versionsInLanguage = viewModel.permittedVersionsList?.filter { $0.languageTag == language } ?? []
         return HStack {
             Image(systemName: "globe")
-            Text(languageName(language))
+            Text(viewModel.languageName(language))
             Text(String(versionsInLanguage.count))
                 .font(.caption2)
                 .padding(.horizontal, 8)
@@ -113,15 +108,17 @@ public struct BibleReaderVersionListView: View {
         .padding()
     }
 
-    private var filteredVersions: [BibleVersion] {
-        let language = activeLanguage
+    private var filteredVersions: [BibleVersion]? {
+        let language = viewModel.activeLanguage
+        guard let versionsList = viewModel.versionsInLanguage[language] else {
+            return nil
+        }
+
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return viewModel.permittedVersions.filter {
-                $0.languageTag == language
-            }
+            return versionsList
         }
         let query = searchText.lowercased()
-        return viewModel.permittedVersions.filter { v in
+        return versionsList.filter { v in
             guard v.languageTag == language else {
                 return false
             }

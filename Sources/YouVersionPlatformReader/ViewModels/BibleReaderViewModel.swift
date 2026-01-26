@@ -42,7 +42,7 @@ final class BibleReaderViewModel {
         self.highlightsViewModel = highlightsViewModel ?? BibleHighlightsViewModel()
         self.colorTheme = ReaderTheme.theme()
         self.myVersions = []
-        self.languagesList = []
+        self.suggestedLanguagesList = []
 
         loadUserSettingsFromStorage()  // will overwrite colorTheme, fontFamily, etc.
 
@@ -93,16 +93,17 @@ final class BibleReaderViewModel {
     }
 
     private func removeUnpermittedVersions() async {
-        if let permittedVersions = try? await YouVersionAPI.Bible.versions() {
-            let permittedIds = Set(permittedVersions.map(\.id))
-            await versionRepository.removeUnpermittedVersions(permittedIds: permittedIds)
+        guard let permittedVersions = await permittedVersionsListing() else {
+            return  // when offline, we don't get a list, but don't delete anything!
+        }
+        let permittedIds = Set(permittedVersions.map(\.id))
+        await versionRepository.removeUnpermittedVersions(permittedIds: permittedIds)
 
-            for version in self.myVersions where !permittedIds.contains(version.id) {
-                self.myVersions.remove(version)
-            }
-            if !permittedIds.contains(reference.versionId) {
-                await selectFallbackVersion(savedIds: Array(self.myVersions.map(\.id)))
-            }
+        for version in self.myVersions where !permittedIds.contains(version.id) {
+            self.myVersions.remove(version)
+        }
+        if !permittedIds.contains(reference.versionId) {
+            await selectFallbackVersion(savedIds: Array(self.myVersions.map(\.id)))
         }
     }
 
@@ -301,12 +302,69 @@ final class BibleReaderViewModel {
 
     // MARK: - Versions list
 
-    var permittedVersions: [BibleVersion] = []
+    /// Maps from a languageCode to a list of BibleVersion objects for that language.
+    var versionsInLanguage: [String: [BibleVersion]] = [:]
+
+    /// Holds minimal information about all Bible versions available to this app, in all languages.
+    var permittedVersionsList: [YouVersionAPI.Bible.BibleVersionMinimalInfo]?
+
+    /// Returns minimal information about all Bible versions available to this app, in all languages.
+    /// On error or when offline, returns nil
+    func permittedVersionsListing() async -> [YouVersionAPI.Bible.BibleVersionMinimalInfo]? {
+        if let permittedVersionsList {
+            return permittedVersionsList
+        }
+
+        let time1 = Date()
+        let versions = try? await YouVersionAPI.Bible.permittedVersions(forLanguageTag: nil)
+        let elapsed = Date().timeIntervalSince(time1)
+        print("fetchBibleVersionMinimalInfo got \(versions?.count ?? -999) in \(String(format: "%.2f", elapsed)) seconds.")
+
+        if let versions {
+            await MainActor.run {
+                if self.permittedVersionsList == nil {
+                    self.permittedVersionsList = versions
+                }
+            }
+        }
+        return versions
+    }
+
+    private var versionsBeingFetched: Set<String> = []
+
+    /// Causes data to be fetched, if necessary, to fill out `versionsInLanguage` for the given language code.
+    /// The fetch happens in a separate task. UI should observe `versionsInLanguage` and update when it does.
+    func fetchVersionsInLanguage(code: String) {
+        guard versionsInLanguage[code] == nil else {
+            return  // no need to fetch: we already have the data
+        }
+        guard !versionsBeingFetched.contains(code) else {
+            return
+        }
+        versionsBeingFetched.insert(code)
+        Task {
+            let time1 = Date()
+            if let unsortedVersions = try? await YouVersionAPI.Bible.versions(forLanguageTag: code) {
+                let elapsed = Date().timeIntervalSince(time1)
+                print("fetchVersionsInLanguage('\(code)') got \(unsortedVersions.count) in \(String(format: "%.2f", elapsed)) seconds.")
+                let sortedVersions = unsortedVersions.sorted {
+                    let a = $0.localizedTitle ?? $0.title ?? $0.localizedAbbreviation ?? $0.abbreviation ?? String($0.id)
+                    let b = $1.localizedTitle ?? $1.title ?? $1.localizedAbbreviation ?? $1.abbreviation ?? String($1.id)
+                    return a < b
+                }
+                await MainActor.run {
+                    self.versionsInLanguage[code] = sortedVersions
+                }
+            }
+            await MainActor.run {
+                versionsBeingFetched.remove(code)
+            }
+        }
+    }
 
     var showFullProgressViewOverlay = false
 
     // MARK: - My Versions
-    // TODO: persist myVersions, and have it not be MRU but user-controlled.
     var myVersions: Set<BibleVersion> = [] {
         didSet {
             Task {
@@ -322,32 +380,44 @@ final class BibleReaderViewModel {
 
     // MARK: - Languages picking
 
-    var languagesList: [LanguageOverview]
+    var suggestedLanguagesList: [LanguageOverview]
     var chosenLanguage: String?
+    var languageNames: [String: String] = [:]
 
-    func loadSuggestedLanguages() async {
+    private func loadSuggestedLanguages() async {
         let region = Locale.current.region?.identifier ?? "US"
         do {
-            languagesList = try await YouVersionAPI.Languages.languages(country: region)
+            let time1 = Date()
+            suggestedLanguagesList = try await YouVersionAPI.Languages.languages(country: region, fields: ["language", "display_names"])
+            let elapsed = Date().timeIntervalSince(time1)
+            print("loadSuggestedLanguages got \(suggestedLanguagesList.count) in \(String(format: "%.2f", elapsed)) seconds.")
         } catch {
             print("Error fetching languages: \(error.localizedDescription)")
         }
     }
 
+    /// Returns languages likely to be ones the user will want. Doesn't return any for which we have no Bible versions.
     var suggestedLanguages: [String] {
-        guard !self.languagesList.isEmpty else {
-            return ["eng", "spa"]
+        guard !self.suggestedLanguagesList.isEmpty else {
+            return ["en", "es"]
         }
-        let codes = extractLanguageCodes(languages: self.languagesList)
+        let codes = extractLanguageCodes(languages: self.suggestedLanguagesList)
+        guard let versionsInfo = permittedVersionsList else {
+            return codes
+        }
         let ret = codes.filter { code in
-            permittedVersions.isEmpty || permittedVersions.contains(where: { $0.languageTag == code })
+            versionsInfo.isEmpty || versionsInfo.contains(where: { $0.languageTag == code })
         }
         return ret
     }
 
+    func languageName(_ lang: String) -> String {
+        languageNames[lang] ?? Locale.current.localizedString(forLanguageCode: lang) ?? lang
+    }
+
     /// Returns language codes from the list, preferring the 3-letter language codes
     private func extractLanguageCodes(languages: [LanguageOverview]) -> [String] {
-        let languageCodes = languages.map { $0.language }
+        let languageCodes = languages.compactMap { $0.language }
 
         // Remove duplicates while preserving order
         var seen = Set<String>()

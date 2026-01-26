@@ -45,20 +45,47 @@ public extension YouVersionAPI.Bible {
                 throw YouVersionAPIError.notPermitted
             }
 
-            guard httpResponse.statusCode == 200 else {
+            guard httpResponse.statusCode == 200 || httpResponse.statusCode == 204 else {
                 print("error in findVersions: \(httpResponse.statusCode)")
                 throw YouVersionAPIError.cannotDownload
             }
 
-            let responseObject = try JSONDecoder().decode(BibleVersionsResponse.self, from: data)
-            allResults.append(contentsOf: responseObject.data)
-            pageToken = responseObject.next_page_token
-            if responseObject.data.isEmpty {
+            if httpResponse.statusCode == 204 {
                 pageToken = nil
+            } else {
+                let responseObject = try JSONDecoder().decode(BibleVersionsResponse.self, from: data)
+                allResults.append(contentsOf: responseObject.data)
+                pageToken = responseObject.next_page_token
+                if responseObject.data.isEmpty {
+                    pageToken = nil
+                }
             }
         } while pageToken != nil
 
         return allResults
+    }
+
+    struct BibleVersionMinimalInfo: Equatable, Sendable {
+        public let id: Int
+        public let languageTag: String?  // see BCP 47
+    }
+
+    static func permittedVersions(
+        forLanguageTag languageTag: String? = nil,
+        accessToken providedToken: String? = nil,
+        session: URLSession = .shared
+    ) async throws -> [BibleVersionMinimalInfo] {
+        let accessToken = providedToken ?? YouVersionPlatformConfiguration.accessToken
+        let range = languageTag == nil ? [] : [languageTag!]
+
+        let data = try await YouVersionAPI.commonFetch(
+            // pageSize: nil means fetch them all. Permitted since we're only getting two fields.
+            url: URLBuilder.versionsURL(languageRanges: range, fields: ["id", "language_tag"], pageSize: nil),
+            accessToken: accessToken,
+            session: session
+        )
+        let responseObject = try JSONDecoder().decode(BibleVersionsResponse.self, from: data)
+        return responseObject.data.map({ BibleVersionMinimalInfo(id: $0.id, languageTag: $0.languageTag) })
     }
 
     private struct BibleVersionsResponse: Decodable {
