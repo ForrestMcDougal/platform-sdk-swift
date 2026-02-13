@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4](https://github.com/youversion/platform-sdk-swift/compare/2.0.3...2.0.4) (2026-02-13)
+
+
+### Bug Fixes
+
+* BibleTextNode whitespace parsing ([63c6fad](https://github.com/youversion/platform-sdk-swift/commit/63c6fad4531fdf1ee8caac4538bf08ae83622842))
+
 ## [2.0.3](https://github.com/youversion/platform-sdk-swift/compare/2.0.2...2.0.3) (2026-02-13)
 
 
