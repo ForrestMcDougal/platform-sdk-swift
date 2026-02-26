@@ -180,7 +180,7 @@ public enum BibleVersionRendering {
             assertionFailed("handleBlockChild: unexpected:", type: node.type)
         }
 
-        interpretTextAttr(node, stateIn: stateIn, stateDown: &stateDown, stateUp: &stateUp)
+        BibleVersionRenderingStyles.interpretTextAttr(node, stateIn: stateIn, stateDown: &stateDown, stateUp: &stateUp)
 
         if stateUp.rendering && !node.text.isEmpty {
             var txt = BibleAttributedString(node.text)
@@ -383,7 +383,7 @@ public enum BibleVersionRendering {
             return
         }
 
-        interpretBlockClasses(
+        BibleVersionRenderingStyles.interpretBlockClasses(
             node.classes,
             stateIn: stateIn,
             stateDown: &stateDown,
@@ -472,253 +472,6 @@ public enum BibleVersionRendering {
         return block
     }
 
-    private static func interpretBlockClasses(
-        _ classes: [String],
-        stateIn: StateIn,
-        stateDown: inout StateDown,
-        stateUp: inout StateUp,
-        marginTop: inout CGFloat
-    ) {
-        let indentStep = 1
-        let ignoredTags = [  // things we don't currently care about:
-            "s1",  // Change line-height to 1em. Co-occurrs with "yv-h".
-            "b",   // Poetry text stanza break (e.g. stanza break)
-            "lh",  // A list header (introductory remark)
-            "li",  // A list entry, level 1 (if single level)
-            "lf",  // List footer (introductory remark)
-            "mr", "ms", "ms1", "ms2", "ms3", "ms4", "s2", "s3", "s4", "sp",  // handled inside yv-h
-            "iex", // see John 7:52
-            "ms1",
-            "qa",
-            "r",
-            "sr",
-            "po",
-            "im",  // non-indented intro paragraph
-            "ior"  // marks references in an outline
-        ]
-
-        for c in classes {
-            switch c {
-
-            case "p", "ip", "imi", "ipi":
-                stateUp.firstLineHeadIndent = indentStep * 2
-                stateUp.headIndent = 0
-
-            case "m", "nb", "im":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
-
-            case "pr", "qr":
-                stateDown.alignment = .trailing
-
-            case "pc", "qc":
-                stateDown.alignment = .center
-                stateDown.smallcaps = true
-                stateDown.textCategory = .header
-
-            case "mi":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 2
-
-            case "pi", "pi1":
-                stateUp.firstLineHeadIndent = indentStep
-                stateUp.headIndent = 0
-
-            case "pi2":
-                stateUp.firstLineHeadIndent = indentStep
-                stateUp.headIndent = indentStep * 2
-
-            case "pi3":
-                stateUp.firstLineHeadIndent = indentStep
-                stateUp.headIndent = indentStep * 3
-
-            case "li1", "ili", "ili1":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = indentStep
-
-            case "li2", "ili2":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = indentStep * 2
-
-            case "li3", "ili3":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = indentStep * 3
-
-            case "li4", "ili4":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = indentStep * 4
-
-            case "iq", "iq1", "q", "q1", "qm", "qm1":
-                // Sadly SwiftUI cannot do this yet, but we want (0, 2 * indentStep) here.
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
-
-            case "iq2", "q2", "qm2":
-                // Sadly SwiftUI cannot do this yet, but we want (indentStep, 2 * indentStep) here.
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
-
-            case "iq3", "q3", "qm3":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
-
-            case "iq4", "q4", "qm4":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
-
-            case "pm", "pmo", "pmc", "pmr":
-                stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = indentStep * 2
-
-            case "d":  // "d" # A Hebrew text heading, to provide description (e.g. Psalms)
-                stateDown.currentFont = .headerItalic
-                stateDown.textCategory = .header
-                if !stateIn.renderHeadlines {
-                    stateUp.rendering = false
-                }
-            
-            case "iot":
-                stateDown.currentFont = .textFontBold
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 3
-            
-            case "is", "is1":
-                stateDown.currentFont = .header2  // want bold and a little larger than body
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 2
-            
-            case "is2":
-                stateDown.currentFont = .textFontBold
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 3
-            
-            case "io", "io1":
-                stateUp.headIndent = indentStep * 2
-                
-            case "io2":
-                stateUp.headIndent = indentStep * 3
-                
-            case "io3", "io4":
-                stateUp.headIndent = indentStep * 4
-                
-            case "imt", "imt1", "imte", "imte1":
-                stateDown.textCategory = .header
-                stateDown.currentFont = .header
-                stateDown.alignment = .center
-
-            case "imt2", "imte2":
-                stateDown.textCategory = .header
-                stateDown.currentFont = .headerItalic
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 2
-
-            case "imt3":
-                stateDown.textCategory = .header
-                stateDown.currentFont = .header3
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 3
-
-            case "imt4":
-                stateDown.textCategory = .header
-                stateDown.currentFont = .header4
-                stateDown.alignment = .center
-                marginTop = stateIn.fonts.baseSize / 3
-                
-            case "yv-h", "yvh":  // yv-h meaning header
-                let fontMap: [String: BibleTextFontOption] = [
-                    "s1": .headerItalic,
-                    "imt": .header,
-                    "imt1": .header,
-                    "ms": .header2,
-                    "ms1": .header2,
-                    "s2": .header2,
-                    "ms2": .header2,
-                    "imt2": .header2,
-                    "s3": .header3,
-                    "ms3": .header3,
-                    "imt3": .header3,
-                    "s4": .header4,
-                    "ms4": .header4,
-                    "imt4": .header4,
-                    "sp": .headerItalic,
-                    "r": .headerItalic,
-                    "sr": .headerItalic,
-                    "mr": .headerSmaller
-                ]
-                marginTop = stateIn.fonts.baseSize
-                stateDown.textCategory = .header
-                stateDown.currentFont = .header
-                for c in classes {
-                    if let font = fontMap[c] {
-                        stateDown.currentFont = font
-                    }
-                }
-                if classes.contains("mr") {
-                    marginTop = 0
-                }
-                stateUp.firstLineHeadIndent = 0
-                if !stateIn.renderHeadlines {
-                    stateUp.rendering = false
-                }
-
-            default:
-                if !ignoredTags.contains(c) {
-                    assertionFailed("interpreting block classes: unexpected ", string: c)
-                }
-            }
-        }
-    }
-
-    private static func interpretTextAttr(
-        _ node: BibleTextNode,
-        stateIn: StateIn,
-        stateDown: inout StateDown,
-        stateUp: inout StateUp
-    ) {
-        // this is a weird place to do this, but the tag is on a block, and block classes don't usually change fonts, so...
-        if stateDown.smallcaps {
-            stateDown.currentFont = .smallCaps
-        }
-
-        for c in node.classes {
-            if c == "wj" {
-                stateDown.woc = true
-            } else if c == "yv-v" || c == "verse" {  // (invisible) start of a verse.
-                if let v = node.attributes["v"] {
-                    if let vi = Int(v) {
-                        stateUp.verse = vi
-                        stateUp.rendering = (vi >= stateIn.fromVerse) && (vi <= stateIn.toVerse)
-                    }
-                }
-            } else if node.classes.contains("nd") || node.classes.contains("sc") {
-                stateDown.currentFont = .smallCaps
-                stateDown.smallcaps = true
-            } else if node.classes.contains("tl") || node.classes.contains("it") || node.classes.contains("add") {
-                stateDown.currentFont = .textFontItalic
-            } else if node.classes.contains("fq") || node.classes.contains("fqa") || node.classes.contains("add") {
-                stateDown.currentFont = .textFontItalic
-            } else if node.classes.contains("qs") || node.classes.contains("qt") {
-                stateDown.currentFont = .textFontItalic
-            } else if node.classes.contains("ord") || node.classes.contains("fv") || node.classes.contains("sup") {
-                stateDown.currentFont = .verseNumFont  // superscript, really; same thing in practice.
-                stateDown.baselineOffset = stateIn.fonts.verseNumBaselineOffset
-            } else {
-                if !["yv-v", "verse", "yv-vlbl", "vlbl", "yv-n", "f", "fr", "ft",
-                     "qs", "sc", "nd", "cl", "w", "litl", "rq", "x"].contains(c) {
-                    assertionFailed("interpretTextAttr: unexpected ", string: c)
-                }
-            }
-        }
-    }
-
-    private static func trimTrailingWhitespaceAndNewlines(_ attributedString: AttributedString) -> AttributedString {
-        var localCopy = attributedString
-        while let lastCharacter = localCopy.characters.last, lastCharacter.isWhitespace {
-            localCopy = AttributedString(localCopy.characters.dropLast())
-        }
-        return localCopy
-    }
-
     /// Finds the first verse number in a node's subtree by searching for verse-labeled spans.
     private static func firstVerseInNode(_ node: BibleTextNode) -> Int? {
         if node.classes.contains("yv-v") || node.classes.contains("verse") {
@@ -734,7 +487,7 @@ public enum BibleVersionRendering {
         return nil
     }
 
-    private static func assertionFailed(
+    static func assertionFailed(
         _ message: String,
         string: String? = nil,
         type: BibleTextNodeType? = nil
@@ -750,7 +503,7 @@ public enum BibleVersionRendering {
     }
 
     // input parameters to the rendering; read-only while walking the node structure.
-    private struct StateIn {
+    struct StateIn {
         var versionId: Int
         var bookUSFM: String
         var currentChapter: Int
@@ -767,7 +520,7 @@ public enum BibleVersionRendering {
 
     // As we walk the node structure, these are attributes which
     // child nodes change, but do not pass up to their parent node.
-    private struct StateDown {
+    struct StateDown {
         var woc = false
         var smallcaps = false
         var alignment = TextAlignment.leading
@@ -779,7 +532,7 @@ public enum BibleVersionRendering {
 
     // As we walk the node structure, these are attributes which
     // child nodes change and pass up to their parent node.
-    private struct StateUp {
+    struct StateUp {
         var rendering: Bool
         var firstLineHeadIndent = 0
         var headIndent = 0
@@ -842,87 +595,6 @@ public enum BibleVersionRendering {
     }
 }
 
-public final class BibleAttributedString: Equatable, Hashable {
-    private var two: AttributedString
-
-    public init() {
-        two = AttributedString()
-    }
-
-    public init(_ string: String) {
-        two = AttributedString(string)
-    }
-
-    static func +(lhs: BibleAttributedString, rhs: BibleAttributedString) -> BibleAttributedString { //swiftlint:disable:this function_name_whitespace
-        let result = BibleAttributedString()
-        result.two = lhs.two + rhs.two
-        return result
-    }
-
-    static func += (lhs: inout BibleAttributedString, rhs: BibleAttributedString) {
-        lhs = lhs + rhs
-    }
-
-    public static func == (lhs: BibleAttributedString, rhs: BibleAttributedString) -> Bool {
-        lhs.two == rhs.two
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        two.hash(into: &hasher)
-    }
-
-    public var asAttributedString: AttributedString {
-        two
-    }
-
-    var characters: String {
-        String(two.characters)
-    }
-
-    var isEmpty: Bool {
-        two.characters.isEmpty
-    }
-
-    @discardableResult
-    public func setFont(_ option: BibleTextFontOption, from fonts: BibleTextFonts) -> BibleAttributedString {
-        two.font = fonts.font(for: option)
-        return self
-    }
-
-    @discardableResult
-    public func setColor(_ color: Color) -> BibleAttributedString {
-        var ac = AttributeContainer()
-        ac.foregroundColor = color
-        two.mergeAttributes(ac)
-        return self
-    }
-
-    @discardableResult
-    public func setBaselineOffset(_ offset: CGFloat) -> BibleAttributedString {
-        two.baselineOffset = offset
-        return self
-    }
-
-    func trimTrailingWhitespaceAndNewlines() {
-        var trimmed = two
-        while let last = trimmed.characters.last, last.isWhitespace {
-            trimmed = AttributedString(trimmed.characters.dropLast())
-        }
-        two = trimmed
-    }
-
-    func markWithTextCategory(_ category: BibleTextCategory) {
-        two.bibleTextCategory = category
-    }
-
-    func markWithReference(_ reference: BibleReference, scheme: String, id: String?) {
-        two.bibleReference = reference
-        let idString = id == nil ? "" : "#\(id!)"
-        two.link = URL(string: "\(scheme)://\(reference.versionId)/\(reference.asUSFM)\(idString)")
-    }
-
-}
-
 public enum BibleTextCategory: Hashable, Sendable {
     case scripture
     case verseLabel
@@ -959,53 +631,6 @@ public extension AttributeDynamicLookup {
         get { self[T.self] }
     }
 }
-// Represents a footnote and its reference location.
-public struct BibleFootnote: Hashable, Identifiable {
-    public let id: String
-    public let text: BibleAttributedString
-    public let reference: BibleReference
-
-    public init(text: BibleAttributedString, reference: BibleReference, id: String) {
-        self.text = text
-        self.reference = reference
-        self.id = id
-    }
-}
-
-public struct BibleTextBlock: Identifiable {
-    public let id = UUID()
-    public let text: BibleAttributedString
-    public let chapter: Int
-    public let rows: [[BibleAttributedString]]  // If it's a table, these are present instead of "text".
-    public let firstLineHeadIndent: Int  // The indentation of the first line of the paragraph. Always >= 0.
-    public let headIndent: Int  // The indentation of the paragraph’s lines other than the first. Always >= 0.
-    //let tailIndent: Int  // If positive, this value is the distance from the leading margin (for example,
-    //the left margin in left-to-right text). If 0 or negative, it’s the distance from the trailing margin.
-    public let marginTop: CGFloat
-    public let alignment: TextAlignment
-    public let footnotes: [BibleFootnote]
-
-    public init(
-        text: BibleAttributedString,
-        chapter: Int,
-        firstLineHeadIndent: Int,
-        headIndent: Int,
-        marginTop: CGFloat,
-        alignment: TextAlignment,
-        footnotes: [BibleFootnote],
-        rows: [[BibleAttributedString]] = []
-    ) {
-        self.text = text
-        self.chapter = chapter
-        self.firstLineHeadIndent = firstLineHeadIndent
-        self.headIndent = headIndent
-        self.marginTop = marginTop
-        self.alignment = alignment
-        self.footnotes = footnotes
-        self.rows = rows
-    }
-}
-
 public enum BibleTextFootnoteMode {
     case none
     case inline
