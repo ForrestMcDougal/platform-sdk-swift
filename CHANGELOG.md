@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.1](https://github.com/youversion/platform-sdk-swift/compare/4.0.0...4.0.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* adjust typography ([beebed6](https://github.com/youversion/platform-sdk-swift/commit/beebed675e58ffa9c8cc96027a9beb7361661e88))
+
 ## [4.0.0](https://github.com/youversion/platform-sdk-swift/compare/3.1.0...4.0.0) (2026-02-26)
 
 
