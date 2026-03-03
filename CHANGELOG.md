@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.3](https://github.com/youversion/platform-sdk-swift/compare/4.0.2...4.0.3) (2026-03-03)
+
+
+### Bug Fixes
+
+* move more localizable strings out of the code ([a941baa](https://github.com/youversion/platform-sdk-swift/commit/a941baa10ed200a44212726352b46a3da3dcaad5))
+
 ## [4.0.2](https://github.com/youversion/platform-sdk-swift/compare/4.0.1...4.0.2) (2026-03-02)
 
 
