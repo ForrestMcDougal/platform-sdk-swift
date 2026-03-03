@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.4](https://github.com/youversion/platform-sdk-swift/compare/4.0.3...4.0.4) (2026-03-03)
+
+
+### Bug Fixes
+
+* adjust max-fields pageSize constant from 5 to 3 ([ec66388](https://github.com/youversion/platform-sdk-swift/commit/ec66388648c2ebea40d2f7b00253e2acea64385d))
+
 ## [4.0.3](https://github.com/youversion/platform-sdk-swift/compare/4.0.2...4.0.3) (2026-03-03)
 
 
