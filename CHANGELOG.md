@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.0](https://github.com/youversion/platform-sdk-swift/compare/4.0.5...4.1.0) (2026-03-12)
+
+
+### Features
+
+* support tvOS (except BibleReader) ([c2396fe](https://github.com/youversion/platform-sdk-swift/commit/c2396fe054b4545191473fa321b350fbb1adf481))
+
 ## [4.0.5](https://github.com/youversion/platform-sdk-swift/compare/4.0.4...4.0.5) (2026-03-12)
 
 
