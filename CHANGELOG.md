@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.3.0](https://github.com/youversion/platform-sdk-swift/compare/4.2.0...4.3.0) (2026-04-13)
+
+
+### Features
+
+* **reader:** add ability for clients to override behavior when user taps verse ([#67](https://github.com/youversion/platform-sdk-swift/issues/67)) ([6d0dd75](https://github.com/youversion/platform-sdk-swift/commit/6d0dd75177e189b4e2a752cfa789cf620d14958b))
+
 ## [4.2.0](https://github.com/youversion/platform-sdk-swift/compare/4.1.0...4.2.0) (2026-03-23)
 
 
