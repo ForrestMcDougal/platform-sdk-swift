@@ -92,19 +92,18 @@ extension BibleReaderViewModel {
             onVerseTap(reference)
             return
         }
-
-        guard YouVersionAPI.isSignedIn else {
-            showingSignInSheet = true
-            return
-        }
         
-        if selectedVerses.contains(reference) {
-            selectedVerses.remove(reference)
-        } else {
-            selectedVerses.insert(reference)
-        }
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 25)) {
-            showingVerseActionsDrawer = !self.selectedVerses.isEmpty
+        if YouVersionAPI.isSignedIn {
+            if selectedVerses.contains(reference) {
+                selectedVerses.remove(reference)
+            } else {
+                selectedVerses.insert(reference)
+            }
+            withAnimation(.interpolatingSpring(stiffness: 300, damping: 25)) {
+                showingVerseActionsDrawer = !self.selectedVerses.isEmpty
+            }
+        } else if YouVersionPlatformConfiguration.isSignInEnabled {
+            showingSignInSheet = true
         }
     }
 
