@@ -135,9 +135,7 @@ public struct BibleReaderView: View {
             }
         }
         .onChange(of: reduceMotion, initial: true) { _, newValue in
-            viewModel.verseActionsDrawerAnimation = newValue
-                ? .easeInOut(duration: 0.2)
-                : .smooth(duration: 0.3)
+            viewModel.isReduceMotionEnabled = newValue
         }
         .environment(viewModel)
         .environment(\.colorScheme, viewModel.colorTheme?.colorScheme ?? .dark)
@@ -174,7 +172,7 @@ public struct BibleReaderView: View {
             }
         }
         .onChange(of: viewModel.showingFontList) {
-            withAnimation(.easeInOut) {
+            withAnimation(reduceMotion ? nil : .easeInOut) {
                 selectedDetent = viewModel.showingFontList ? fontListDetent : fontSettingsDetent
             }
         }
