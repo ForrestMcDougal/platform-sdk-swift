@@ -2,16 +2,24 @@ import SwiftUI
 import YouVersionPlatformCore
 
 struct BibleReaderVersionsStack: View {
-    @Environment(BibleReaderViewModel.self) private var viewModel
+    @Environment(BibleVersionsViewModel.self) private var viewModel
 
     var body: some View {
         @Bindable var bindableViewModel = viewModel
 
         NavigationStack(path: $bindableViewModel.versionsPickerStack) {
             rootView
-                .navigationDestination(for: BibleReaderViewModel.VersionsPickerScreen.self) { screen in
+                .navigationDestination(for: BibleVersionsViewModel.VersionsPickerScreen.self) { screen in
                     destinationView(for: screen)
                 }
+        }
+        .alert(
+            viewModel.textForGenericAlertTitle,
+            isPresented: $bindableViewModel.showGenericAlert
+        ) {
+            Button(viewModel.textForGenericAlertOKButton) { }
+        } message: {
+            Text(viewModel.textForGenericAlertBody)
         }
     }
 
@@ -34,7 +42,7 @@ struct BibleReaderVersionsStack: View {
     }
 
     @ViewBuilder
-    private func destinationView(for screen: BibleReaderViewModel.VersionsPickerScreen) -> some View {
+    private func destinationView(for screen: BibleVersionsViewModel.VersionsPickerScreen) -> some View {
         switch screen {
         case .myVersions:
             BibleReaderMyVersionsView()
@@ -45,12 +53,12 @@ struct BibleReaderVersionsStack: View {
         case .versionDownload:
             BibleVersionDownloadView()
         case .languages:
-            BibleReaderLanguagesView(viewModel: viewModel)
+            BibleReaderLanguagesView()
         }
     }
 }
 
 #Preview {
     BibleReaderVersionsStack()
-        .environment(BibleReaderViewModel.preview)
+        .environment(BibleVersionsViewModel.preview)
 }

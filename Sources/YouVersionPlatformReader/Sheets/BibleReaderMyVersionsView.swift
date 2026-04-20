@@ -3,7 +3,7 @@ import YouVersionPlatformCore
 import YouVersionPlatformUI
 
 public struct BibleReaderMyVersionsView: View {
-    @Environment(BibleReaderViewModel.self) private var viewModel
+    @Environment(BibleVersionsViewModel.self) private var viewModel
 
     public var body: some View {
         VStack {
@@ -69,5 +69,5 @@ public struct BibleReaderMyVersionsView: View {
 
 #Preview {
     BibleReaderMyVersionsView()
-        .environment(BibleReaderViewModel.preview)
+        .environment(BibleVersionsViewModel.preview)
 }

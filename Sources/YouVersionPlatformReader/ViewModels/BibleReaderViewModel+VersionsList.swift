@@ -2,10 +2,10 @@ import SwiftUI
 import YouVersionPlatformCore
 import YouVersionPlatformUI
 
-extension BibleReaderViewModel {
+extension BibleVersionsViewModel {
 
     public var activeLanguage: String {
-        chosenLanguage ?? version?.languageTag ?? "en"
+        chosenLanguage ?? currentBibleVersionLanguage ?? "en"
     }
 
     public var bibleVersionStatisticsPromo: String {
@@ -36,8 +36,12 @@ extension BibleReaderViewModel {
 
     public func switchToVersion(_ versionId: Int) {
         Task {
-            let ref = BibleReference(versionId: versionId, bookUSFM: reference.bookUSFM, chapter: reference.chapter)
-            await onHeaderSelectionChange(ref, showIntro: false)
+            do {
+                let version = try await versionRepository.version(withId: versionId)
+                onVersionChange(version)
+            } catch {
+                handleVersionLoadingError(error)
+            }
         }
     }
 
@@ -52,10 +56,7 @@ extension BibleReaderViewModel {
                 selectedVersion = version
                 versionsStackPush(to: .versionInfo)
             } catch {
-                YouVersionPlatformLogger.error("Error loading version: \(error)", category: "Reader")
-                showGenericAlert = true
-                textForGenericAlertTitle = .localized("generic.error")
-                textForGenericAlertBody = .localized("reader.versionAccessErrorBody")
+                handleVersionLoadingError(error)
             }
         }
     }
@@ -112,13 +113,20 @@ extension BibleReaderViewModel {
         if let currentLanguage, let name = names[currentLanguage] {
             return name
         }
-        if let bibleLanguage = version?.languageTag, let name = names[bibleLanguage] {
+        if let bibleLanguage = currentBibleVersionLanguage, let name = names[bibleLanguage] {
             return name
         }
         if let name = names["en"] {
             return name
         }
         return names.first?.value
+    }
+
+    func handleVersionLoadingError(_ error: Error) {
+        YouVersionPlatformLogger.error("Error loading version: \(error)", category: "Reader")
+        showGenericAlert = true
+        textForGenericAlertTitle = .localized("generic.error")
+        textForGenericAlertBody = .localized("reader.versionAccessErrorBody")
     }
 
 }

@@ -24,6 +24,7 @@ public struct BibleReaderHeaderView: View {
 
     public var body: some View {
         @Bindable var viewModel = viewModel
+        @Bindable var bindableVersionsViewModel = viewModel.versionsViewModel
 
         HStack {
             if showChrome {
@@ -77,34 +78,51 @@ public struct BibleReaderHeaderView: View {
                 ProgressView()
             }
         }
+        .sheet(isPresented: $bindableVersionsViewModel.showingVersionsStack) {
+            BibleReaderVersionsStack()
+                .environment(viewModel.versionsViewModel)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.large])
+        }
     }
 
     @ViewBuilder
     private var halfPillPickers: some View {
         if let version = viewModel.version {
             let title = viewModel.showBookIntro ? introString : bookAndChapter
-            BibleReaderHalfPillPickersView(
+
+            halfPillPickersView(
                 bookAndChapter: title,
                 versionAbbreviation: version.localizedAbbreviation ?? version.abbreviation ?? String(version.id),
                 handleChapterTap: { viewModel.showingBookPicker.toggle() },
-                handleVersionTap: { viewModel.handlePickersVersionTap() },
-                foregroundColor: viewModel.readerTextPrimaryColor,
-                buttonColor: viewModel.readerButtonPrimaryColor,
-                backgroundColor: viewModel.readerCanvasPrimaryColor,
-                compactMode: false
+                handleVersionTap: { viewModel.versionsViewModel.openVersionsStack(currentBibleLanguage: version.languageTag ?? "en") }
             )
         } else {
-            BibleReaderHalfPillPickersView(
+            halfPillPickersView(
                 bookAndChapter: "",
                 versionAbbreviation: "",
                 handleChapterTap: {},
-                handleVersionTap: {},
-                foregroundColor: viewModel.readerTextPrimaryColor,
-                buttonColor: viewModel.readerButtonPrimaryColor,
-                backgroundColor: viewModel.readerCanvasPrimaryColor,
-                compactMode: false
+                handleVersionTap: {}
             )
         }
+    }
+
+    private func halfPillPickersView(
+        bookAndChapter: String,
+        versionAbbreviation: String,
+        handleChapterTap: @escaping () -> Void,
+        handleVersionTap: @escaping () -> Void
+    ) -> some View {
+        BibleReaderHalfPillPickersView(
+            bookAndChapter: bookAndChapter,
+            versionAbbreviation: versionAbbreviation,
+            handleChapterTap: handleChapterTap,
+            handleVersionTap: handleVersionTap,
+            foregroundColor: viewModel.readerTextPrimaryColor,
+            buttonColor: viewModel.readerButtonPrimaryColor,
+            backgroundColor: viewModel.readerCanvasPrimaryColor,
+            compactMode: false
+        )
     }
 
     private var bookAndChapter: String {

@@ -26,7 +26,13 @@ struct ReaderTheme: Identifiable {
     }
 }
 
-extension BibleReaderViewModel {
+@MainActor
+protocol ReaderThemeProviding {
+    var colorTheme: ReaderTheme? { get }
+}
+
+@MainActor
+extension ReaderThemeProviding {
     func colorForScheme(light: Color, dark: Color) -> Color {
         colorTheme?.colorScheme == .dark ? dark : light
     }
@@ -122,3 +128,7 @@ extension BibleReaderViewModel {
         )
     }
 }
+
+extension BibleReaderViewModel: ReaderThemeProviding {}
+
+extension BibleVersionsViewModel: ReaderThemeProviding {}

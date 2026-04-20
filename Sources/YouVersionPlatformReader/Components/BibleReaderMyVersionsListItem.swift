@@ -3,7 +3,7 @@ import YouVersionPlatformCore
 import YouVersionPlatformUI
 
 struct BibleReaderMyVersionsListItem: View, AbbreviationSplitting {
-    @Environment(BibleReaderViewModel.self) private var viewModel
+    @Environment(BibleVersionsViewModel.self) private var viewModel
     let item: BibleVersion
 
     var body: some View {
@@ -131,9 +131,9 @@ struct BibleReaderMyVersionsListItem: View, AbbreviationSplitting {
     VStack {
         Divider()
         BibleReaderMyVersionsListItem(
-            item: BibleReaderViewModel.preview.myVersions.first!
+            item: BibleVersionsViewModel.preview.myVersions.first!
         )
         Divider()
     }
-    .environment(BibleReaderViewModel.preview)
+    .environment(BibleVersionsViewModel.preview)
 }

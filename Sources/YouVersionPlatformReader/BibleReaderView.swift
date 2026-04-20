@@ -88,14 +88,6 @@ public struct BibleReaderView: View {
         .foregroundStyle(viewModel.readerTextPrimaryColor)
         .background(viewModel.readerCanvasPrimaryColor)
         .alert(
-            viewModel.textForGenericAlertTitle,
-            isPresented: $viewModel.showGenericAlert
-        ) {
-            Button(viewModel.textForGenericAlertOKButton) { }
-        } message: {
-            Text(viewModel.textForGenericAlertBody)
-        }
-        .alert(
             String.localized("signOut.question"),
             isPresented: $viewModel.showSignOutConfirmation
         ) {
@@ -123,11 +115,6 @@ public struct BibleReaderView: View {
         })
         .sheet(isPresented: $viewModel.showingSignInSheet) {
             signInView
-        }
-        .sheet(isPresented: $viewModel.showingVersionsStack) {
-            BibleReaderVersionsStack()
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.large])
         }
         .onChange(of: viewModel.startSignInFlow) { _, newValue in
             if newValue {
@@ -324,6 +311,7 @@ public struct BibleReaderView: View {
     // MARK: - Action handlers
 
     private func startSignIn() {
+        // TODO: move this code into BibleReaderViewModel
         Task {
             do {
                 viewModel.startSignInFlow = false
