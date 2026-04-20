@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.6.0](https://github.com/youversion/platform-sdk-swift/compare/4.5.0...4.6.0) (2026-04-20)
+
+
+### Features
+
+* **reader:** improve verse actions animation and respect accessibility Reduce Motion setting ([#76](https://github.com/youversion/platform-sdk-swift/issues/76)) ([1e63e1e](https://github.com/youversion/platform-sdk-swift/commit/1e63e1e949db40c4e004ad50e1deb295f19ef418))
+
 ## [4.5.0](https://github.com/youversion/platform-sdk-swift/compare/4.4.0...4.5.0) (2026-04-17)
 
 
