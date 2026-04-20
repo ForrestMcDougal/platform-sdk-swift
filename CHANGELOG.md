@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.8.0](https://github.com/youversion/platform-sdk-swift/compare/4.7.0...4.8.0) (2026-04-20)
+
+
+### Features
+
+* make all animations aware of reduce motion setting and add corresponding lint rule ([967874f](https://github.com/youversion/platform-sdk-swift/commit/967874f676ae2db021d5e73ba5e5f5c150a44fab))
+
 ## [4.7.0](https://github.com/youversion/platform-sdk-swift/compare/4.6.0...4.7.0) (2026-04-20)
 
 
