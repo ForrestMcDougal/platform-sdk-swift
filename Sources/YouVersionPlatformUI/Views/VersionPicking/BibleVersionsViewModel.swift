@@ -2,40 +2,51 @@ import CoreText
 import Foundation
 import SwiftUI
 import YouVersionPlatformCore
-import YouVersionPlatformUI
 
 @MainActor
 @Observable
-final class BibleVersionsViewModel {
-    private let userDefaultsKeyForMyVersions = "bible-reader-view--my-versions"
-    let versionRepository = BibleVersionRepository()
-    var onVersionChange: ((BibleVersion) -> Void)
+public final class BibleVersionsViewModel {
+    public var onVersionChange: ((BibleVersion) -> Void)
     /// called when the user chooses to download a version and they're not yet signed in.
-    var onSignInRequired: (() -> Void)?
-    var colorTheme: ReaderTheme?
-    
+    public var onSignInRequired: (() -> Void)?
+    public var colorTheme: ReaderTheme?
+
+    public let versionRepository: any BibleVersionRepositoryProtocol
+
     var currentBibleVersionLanguage: String?
-    
     var showGenericAlert = false
     var textForGenericAlertTitle = ""
     var textForGenericAlertBody = ""
     private(set) var textForGenericAlertOKButton = "OK"
     
+    private let userDefaultsKeyForMyVersions = "bible-reader-view--my-versions"
+    private var hasLoadedInitialState = false
+
     /// onVersionChange: called when the user has chosen a new version (or their first). The caller should ensure their current reference exists in this new version and choose a new one if not.
-    init (initialVersionId: Int? = nil, onVersionChange: @escaping (BibleVersion) -> Void) {
-        // grab the saved data first, because initializing myVersions will clear the saved data.
-        let savedIds = UserDefaults.standard.array(forKey: userDefaultsKeyForMyVersions) as? [Int] ?? []
-        
+    public init(
+        onVersionChange: @escaping (BibleVersion) -> Void,
+        versionRepository: any BibleVersionRepositoryProtocol = BibleVersionRepository.shared
+    ) {
         self.myVersions = []
         self.suggestedLanguagesList = []
         self.onVersionChange = onVersionChange
-        
-        Task {
-            await loadVersion(versionId: initialVersionId, savedIds: savedIds)
-            await restoreMyVersions(savedIds: savedIds)
-            await loadSuggestedLanguages()
-            await removeUnpermittedVersions(initialVersionId: initialVersionId)
+        self.versionRepository = versionRepository
+    }
+
+    /// Loads the initial version data once for this model instance.
+    public func loadInitialState(initialVersionId: Int? = nil) async {
+        guard !hasLoadedInitialState else {
+            return
         }
+        hasLoadedInitialState = true
+
+        // Grab the saved data first, because initializing myVersions clears the saved data.
+        let savedIds = UserDefaults.standard.array(forKey: userDefaultsKeyForMyVersions) as? [Int] ?? []
+
+        await loadVersion(versionId: initialVersionId, savedIds: savedIds)
+        await restoreMyVersions(savedIds: savedIds)
+        await loadSuggestedLanguages()
+        await removeUnpermittedVersions(initialVersionId: initialVersionId)
     }
     
     private func removeUnpermittedVersions(initialVersionId: Int?) async {
@@ -206,7 +217,7 @@ final class BibleVersionsViewModel {
     var showFullProgressViewOverlay = false
     
     // MARK: - My Versions
-    var myVersions: Set<BibleVersion> = [] {
+    public var myVersions: Set<BibleVersion> = [] {
         didSet {
             Task {
                 // The below iteration must be run in a Task to avoid view re-creation loops.
@@ -285,7 +296,7 @@ final class BibleVersionsViewModel {
         case languages
     }
     
-    var showingVersionsStack = false
+    public var showingVersionsStack = false
     var versionsPickerStack: [VersionsPickerScreen] = []
     
     var selectedVersion: BibleVersion?
@@ -303,7 +314,7 @@ final class BibleVersionsViewModel {
         }
         return org.name
     }
-
+    
     // MARK: - Preview helper
 
     public static var preview: BibleVersionsViewModel {
