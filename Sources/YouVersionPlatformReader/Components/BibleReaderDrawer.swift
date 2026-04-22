@@ -30,6 +30,7 @@ struct BibleReaderDrawer: View {
                 .padding(.horizontal, 24)
             }
             .padding(.bottom, 32)
+            //swipeUpLabel  // uncomment this once we support swipe, and have something to show!
         }
         .foregroundStyle(viewModel.readerTextMutedColor)
         .background(viewModel.readerCanvasPrimaryColor)
@@ -105,6 +106,14 @@ struct BibleReaderDrawer: View {
         drawerButton(imageName: "square.on.square", text: .localized("verseActions.copy")) {
             viewModel.handleVerseActionCopy()
         }
+    }
+
+    var swipeUpLabel: some View {
+        HStack {
+            Image(systemName: "chevron.up")
+            Text(String.localized("verseActions.swipeUpLabel"))
+        }
+        .font(ReaderFonts.fontCaptionsL)
     }
 }
 

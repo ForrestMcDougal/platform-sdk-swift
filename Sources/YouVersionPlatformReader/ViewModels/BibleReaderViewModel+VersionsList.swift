@@ -3,6 +3,7 @@ import YouVersionPlatformCore
 import YouVersionPlatformUI
 
 extension BibleVersionsViewModel {
+
     public var activeLanguage: String {
         chosenLanguage ?? currentBibleVersionLanguage ?? "en"
     }
@@ -24,6 +25,12 @@ extension BibleVersionsViewModel {
         if versionRepository.downloadStatus(for: id) == .downloaded {
             return .downloaded
         }
+        // TEMPORARY
+//        if let overview = permittedVersions.first(where: { $0.id == id }) {
+//            if overview.downloadable == true {
+//                return .downloadable
+//            }
+//        }
         return .notDownloadable
     }
 
@@ -82,7 +89,7 @@ extension BibleVersionsViewModel {
     }
 
     public func languageTapped() {
-        if permittedVersionsList?.isEmpty ?? true {
+        if permittedVersionsList == nil || permittedVersionsList!.isEmpty {
             showGenericAlert = true
             textForGenericAlertTitle = .localized("generic.error")
             textForGenericAlertBody = .localized("reader.availableLanguagesErrorBody")
@@ -121,4 +128,5 @@ extension BibleVersionsViewModel {
         textForGenericAlertTitle = .localized("generic.error")
         textForGenericAlertBody = .localized("reader.versionAccessErrorBody")
     }
+
 }

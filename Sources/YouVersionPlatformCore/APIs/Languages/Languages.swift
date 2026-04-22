@@ -99,7 +99,7 @@ public extension YouVersionAPI {
 
                 let responseObject = try JSONDecoder().decode(LanguagesResponse.self, from: data)
                 allResults.append(contentsOf: responseObject.data)
-                pageToken = responseObject.nextPageToken
+                pageToken = responseObject.next_page_token
             } while pageToken != nil
 
             return allResults
@@ -107,14 +107,8 @@ public extension YouVersionAPI {
 
         private struct LanguagesResponse: Decodable {
             let data: [LanguageOverview]
-            let nextPageToken: String?
-            let totalSize: Int?
-
-            enum CodingKeys: String, CodingKey {
-                case data
-                case nextPageToken = "next_page_token"
-                case totalSize = "total_size"
-            }
+            let next_page_token: String?
+            let total_size: Int?
         }
     }
 }

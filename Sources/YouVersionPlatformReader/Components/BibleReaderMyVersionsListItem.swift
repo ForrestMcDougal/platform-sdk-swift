@@ -57,7 +57,12 @@ struct BibleReaderMyVersionsListItem: View, AbbreviationSplitting {
             }
 
             Spacer()
-
+            // TEMPORARY
+//            if viewModel.versionRepository.downloadStatus(for: item.id) != .downloaded {
+//                Image(systemName: "cloud")
+//                    .foregroundStyle(viewModel.readerTextMutedColor)
+//                    .padding(.trailing, 8)
+//            }
             ellipsisMenuButton
         }
         .contentShape(Rectangle())

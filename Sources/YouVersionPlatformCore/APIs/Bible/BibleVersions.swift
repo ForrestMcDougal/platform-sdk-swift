@@ -55,7 +55,7 @@ public extension YouVersionAPI.Bible {
             } else {
                 let responseObject = try JSONDecoder().decode(BibleVersionsResponse.self, from: data)
                 allResults.append(contentsOf: responseObject.data)
-                pageToken = responseObject.nextPageToken
+                pageToken = responseObject.next_page_token
                 if responseObject.data.isEmpty {
                     pageToken = nil
                 }
@@ -90,11 +90,7 @@ public extension YouVersionAPI.Bible {
 
     private struct BibleVersionsResponse: Decodable {
         let data: [BibleVersion]
-        let nextPageToken: String?
-
-        enum CodingKeys: String, CodingKey {
-            case data
-            case nextPageToken = "next_page_token"
-        }
+        let next_page_token: String?
+        let total_size: Int?
     }
 }

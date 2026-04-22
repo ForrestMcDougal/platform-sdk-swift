@@ -10,10 +10,11 @@ public struct BibleReaderView: View {
 #endif
 
     @Environment(\.openURL) private var openURL
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let fontSettingsDetent = PresentationDetent.height(360)
-    private let fontListDetent = PresentationDetent.height(480)
+    let fontSettingsDetent = PresentationDetent.height(360)
+    let fontListDetent = PresentationDetent.height(480)
     @State private var selectedDetent: PresentationDetent
     @State private var detents: Set<PresentationDetent>
 
@@ -282,7 +283,7 @@ public struct BibleReaderView: View {
     }
 
 #if !os(tvOS)
-    final class ContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+    class ContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
         func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
 #if canImport(UIKit)
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -299,7 +300,7 @@ public struct BibleReaderView: View {
 #endif
 
     /// Helper to detect scroll offset in ScrollView
-    private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    struct ScrollOffsetPreferenceKey: PreferenceKey {
         typealias Value = CGFloat
         static var defaultValue: Value { .zero }
         static func reduce(value: inout Value, nextValue: () -> Value) {
