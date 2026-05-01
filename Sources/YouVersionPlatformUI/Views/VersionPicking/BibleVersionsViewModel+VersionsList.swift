@@ -27,29 +27,33 @@ extension BibleVersionsViewModel {
     }
 
     public func switchToVersion(_ versionId: Int) {
-        Task {
-            do {
-                let version = try await versionRepository.version(withId: versionId)
-                onVersionChange(version)
-            } catch {
-                handleVersionLoadingError(error)
-            }
+        Task { await switchToVersion(versionId) }
+    }
+
+    func switchToVersion(_ versionId: Int) async {
+        do {
+            let version = try await versionRepository.version(withId: versionId)
+            onVersionChange(version)
+        } catch {
+            handleVersionLoadingError(error)
         }
     }
 
     public func handleVersionPickerTap(_ versionId: Int) {
-        Task {
-            do {
-                showFullProgressViewOverlay = true
-                defer {
-                    showFullProgressViewOverlay = false
-                }
-                let version = try await versionRepository.version(withId: versionId)
-                selectedVersion = version
-                versionsStackPush(to: .versionInfo)
-            } catch {
-                handleVersionLoadingError(error)
+        Task { await handleVersionPickerTap(versionId) }
+    }
+
+    func handleVersionPickerTap(_ versionId: Int) async {
+        do {
+            showFullProgressViewOverlay = true
+            defer {
+                showFullProgressViewOverlay = false
             }
+            let version = try await versionRepository.version(withId: versionId)
+            selectedVersion = version
+            versionsStackPush(to: .versionInfo)
+        } catch {
+            handleVersionLoadingError(error)
         }
     }
 
