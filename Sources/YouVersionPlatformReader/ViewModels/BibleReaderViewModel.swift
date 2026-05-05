@@ -35,7 +35,7 @@ final class BibleReaderViewModel: ReaderThemeProviding {
     var isChangingChapter = false
     var showingSignInSheet = false
     var showingFontSettings = false
-    var showingFontList = false
+    var showingFontList = false // swiftlint:disable:this collection_suffix_property
     var showingFootnotes = false
     var showingIntroFootnoteSheet = false
     var showingVerseActionsDrawer = false

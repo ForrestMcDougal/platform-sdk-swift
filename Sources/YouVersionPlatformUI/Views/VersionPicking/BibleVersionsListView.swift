@@ -112,21 +112,21 @@ public struct BibleVersionsListView: View {
 
     private var filteredVersions: [BibleVersion]? {
         let language = viewModel.activeLanguage
-        guard let versionsList = viewModel.versionsByLanguageTag[language] else {
+        guard let versions = viewModel.versionsByLanguageTag[language] else {
             return nil
         }
 
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return versionsList
+            return versions
         }
         let query = searchText.lowercased()
-        return versionsList.filter { v in
-            guard v.languageTag == language else {
+        return versions.filter { version in
+            guard version.languageTag == language else {
                 return false
             }
-            let title = (v.title ?? "").lowercased()
-            let abbr = (v.abbreviation ?? String(v.id)).lowercased()
-            let lang = (v.languageTag ?? "")
+            let title = (version.title ?? "").lowercased()
+            let abbr = (version.abbreviation ?? String(version.id)).lowercased()
+            let lang = (version.languageTag ?? "")
             return title.contains(query) || abbr.contains(query) || lang.contains(query)
         }
     }
