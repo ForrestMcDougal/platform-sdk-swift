@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.1](https://github.com/youversion/platform-sdk-swift/compare/5.1.0...5.1.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* **ci:** make pod publish resumable after partial trunk failure ([#112](https://github.com/youversion/platform-sdk-swift/issues/112)) ([77c45d0](https://github.com/youversion/platform-sdk-swift/commit/77c45d0430aab952e35c5840c9c1413111e1b934))
+
 ## [5.1.0](https://github.com/youversion/platform-sdk-swift/compare/5.0.0...5.1.0) (2026-05-07)
 
 
