@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.1](https://github.com/youversion/platform-sdk-swift/compare/5.2.0...5.2.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* normalize bookUSFM case in overlaps/contains and fix chapter-only USFM parsing ([52b9bf5](https://github.com/youversion/platform-sdk-swift/commit/52b9bf5b6b8bfe2b68ed888a5c4b6268eb7233bf))
+
 ## [5.2.0](https://github.com/youversion/platform-sdk-swift/compare/5.1.1...5.2.0) (2026-05-08)
 
 
