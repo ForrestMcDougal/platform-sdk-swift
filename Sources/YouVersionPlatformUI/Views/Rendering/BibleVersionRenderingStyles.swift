@@ -87,17 +87,21 @@ final class BibleVersionRenderingStyles {
                 stateUp.headIndent = 0
 
             case "iq2", "q2", "qm2":
-                // Sadly SwiftUI cannot do this yet, but we want (indentStep, 2 * indentStep) here.
+                // Common Prayer fork: indent secondary poetic lines. headIndent is
+                // rendered as .padding(.leading, 8 * headIndent), giving a uniform
+                // per-line poetic indent (psalms etc.). Was 0.
                 stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
+                stateUp.headIndent = 2
 
             case "iq3", "q3", "qm3":
+                // Common Prayer fork: tertiary poetic line. Was 0.
                 stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
+                stateUp.headIndent = 3
 
             case "iq4", "q4", "qm4":
+                // Common Prayer fork: quaternary poetic line. Was 0.
                 stateUp.firstLineHeadIndent = 0
-                stateUp.headIndent = 0
+                stateUp.headIndent = 4
 
             case "pm", "pmo", "pmc", "pmr":
                 stateUp.firstLineHeadIndent = 0
