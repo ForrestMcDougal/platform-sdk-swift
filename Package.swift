@@ -48,38 +48,22 @@ targets.append(
     )
 )
 targets.append(
-    .target(
-        name: "YouVersionPlatformReader",
-        dependencies: [
-            .target(name: "YouVersionPlatformUI"),
-        ],
-        resources: [
-            .process("Resources")
-        ]
-    )
-)
-targets.append(
     .testTarget(
         name: "YouVersionPlatformUITests",
         dependencies: ["YouVersionPlatformUI"]
     )
 )
-targets.append(
-    .testTarget(
-        name: "YouVersionPlatformReaderTests",
-        dependencies: [
-            "YouVersionPlatformCore",
-            "YouVersionPlatformReader",
-        ]
-    )
-)
+// Common Prayer slim: the YouVersionPlatformReader target (a full in-SDK reader
+// UI) is unused by the app and dropped to cut build time. It is a leaf — nothing
+// in Core/UI depends on it. If a future need arises, restore it here, in the
+// umbrella `YouVersionPlatform` dependencies, and re-add the `@_exported import`
+// in Sources/YouVersionPlatformAll.
 targets.append(
     .target(
         name: "YouVersionPlatform",
         dependencies: [
             .target(name: "YouVersionPlatformCore"),
             .target(name: "YouVersionPlatformUI"),
-            .target(name: "YouVersionPlatformReader"),
         ],
         path: "Sources/YouVersionPlatformAll"
     )
